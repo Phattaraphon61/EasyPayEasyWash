@@ -8,9 +8,9 @@
 int Relay1 = D5;
 int Relay2 = D6;
 int sensor = D7;
-//int led = 4;
+int ldr = D0;
+int ldrval = 0;
 int i = 0;
-//int c = 0;
 const char* mqtt_server = "mqtt.easypayeasywash.tk";
 
 ESP8266WebServer Server;
@@ -123,6 +123,7 @@ void setup() {
   setup_wifi();
   Serial.println(espid);
   pinMode(sensor, INPUT);
+  pinMode(ldr, INPUT);
   pinMode(Relay1, OUTPUT); // กำหนดขาทำหน้าที่ให้ขา D0 เป็น OUTPUT
   digitalWrite(Relay1, HIGH);
   pinMode(Relay2, OUTPUT); // กำหนดขาทำหน้าที่ให้ขา D0 เป็น OUTPUT
@@ -134,6 +135,7 @@ void setup() {
   attachInterrupt(digitalPinToInterrupt(sensor), doCounter, RISING);
 }
 void loop() {
+  ldrval = digitalRead(ldr);
   static String msg = "";
   client.loop();
   Portal.handleClient();
@@ -180,6 +182,8 @@ void loop() {
         //        qrcode.create(value_2);
         Serial.println(value_2.toFloat());
         Serial.println(coin);
+        Serial.print("ldrval = ");
+        Serial.println(ldrval);
       }
       Serial.print( value_1.toInt() ); //แปลงค่าจาก String เป็นจำนวนเต็มด้วย toInt()
       Serial.print(" and ");
