@@ -127,7 +127,7 @@ int fontNumber = -1; // << Use [Number] in brackets from the fonts listed.
 //                                                  the font numbers are listed when the sketch is run.
 //                |         1         2     |       Maximum filename size for SPIFFS is 31 including leading /
 //                 1234567890123456789012345        and added point size and .vlw extension, so max is 25
-String fontName = "Final-Frontier";  // Manually crop the filename length later after creation if needed
+String fontName = "Prompt-ExtraLight";  // Manually crop the filename length later after creation if needed
                                      // Note: SPIFFS does NOT accept underscore in a filename!
 String fontType = ".ttf";
 //String fontType = ".otf";
@@ -183,7 +183,7 @@ static final int[] unicodeBlocks = {
   //0x0C80, 0x0CFF, //Kannada, 128, 88, Kannada
   //0x0D00, 0x0D7F, //Malayalam, 128, 117, Malayalam
   //0x0D80, 0x0DFF, //Sinhala, 128, 90, Sinhala
-  //0x0E00, 0x0E7F, //Thai, 128, 87, Thai (86 characters), Common (1 character)
+  0x0E00, 0x0E7F, //Thai, 128, 87, Thai (86 characters), Common (1 character)
   //0x0E80, 0x0EFF, //Lao, 128, 67, Lao
   //0x0F00, 0x0FFF, //Tibetan, 256, 211, Tibetan (207 characters), Common (4 characters)
   //0x1000, 0x109F, //Myanmar, 160, 160, Myanmar

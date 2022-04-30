@@ -9,7 +9,6 @@ QRcode_eSPI qrcode (&display);
 
 
 void setup() {
-
   Serial.begin(115200);
   Serial.println("");
   Serial.println("Starting...");
@@ -24,6 +23,10 @@ void setup() {
 }
 
 void loop() {
+  uint16_t t_x = 0, t_y = 0;
+  bool pressed = display.getTouch(&t_x, &t_y);
+  Serial.println(t_x);
+  Serial.println(t_y);
   static String msg = "";
 
   /**
@@ -56,6 +59,7 @@ void loop() {
       String value_2 = getValue(msg, ',', 1);
       if (value_1.toInt() == 1) {
         Serial.print("value_1 : ");
+        display.fillScreen(TFT_BLUE);
         Serial.println(value_2.toFloat());
       }
       if (value_1.toInt() == 2) {
