@@ -1,10 +1,10 @@
 
 #include <TFT_eSPI.h>
 #include <qrcode_espi.h>
-
+#include <SoftwareSerial.h>
 TFT_eSPI tft = TFT_eSPI();
 QRcode_eSPI qrcode (&tft);
-
+SoftwareSerial arduinocon(5, 4);
 
 #include <JPEGDecoder.h>
 
@@ -17,6 +17,7 @@ QRcode_eSPI qrcode (&tft);
 
 uint32_t icount = 0;
 int coin = 20;
+String qr;
 int page = 1;
 int page1 = 0;
 int page2 = 0;
@@ -24,6 +25,7 @@ int page3 = 0;
 
 void setup() {
   Serial.begin(115200);
+  arduinocon.begin(57600);
   tft.begin();
   qrcode.init();
   tft.setRotation(1);
@@ -33,10 +35,11 @@ void setup() {
 }
 
 void loop() {
+  static String msg = "";
   uint16_t x, y;
   if (page == 1 && page1 == 0) {
     drawArrayJpeg(Menu, sizeof(Menu), 0, 0);
-//     tft.fillRect(40, 120, 150, 130, TFT_RED);
+    //     tft.fillRect(40, 120, 150, 130, TFT_RED);
     page1 = 1;
   }
   if (page == 2 && page2 == 0) {
@@ -51,13 +54,14 @@ void loop() {
   }
   if (page == 3 && page3 == 0) {
     drawArrayJpeg(Menuqrcode, sizeof(Menuqrcode), 0, 0);
-    qrcode.create("000201010212306101151783944980008630217PORTALSANDBOXREF10317PORTALSANDBOXREF15204701153037645402205802TH5915EasyPayEasyWash6007BANGKOK62610104291303154499448415279550523202204300922517320000000703PUQ630420CD");
+    qrcode.create(qr);
     page3 = 1;
   }
   if (tft.getTouch(&x, &y))
   {
     if ((x > 40) && (x < 180)) {
       if ((y > 120) && (y < 255)) {
+        arduinocon.write("coin,0\n");
         Serial.println("Coin");
         if (page == 1) {
           page = 2;
@@ -67,11 +71,8 @@ void loop() {
     }
     if ((x > 290) && (x < 430)) {
       if ((y > 120) && (y < 255)) {
+        arduinocon.write("1,0\n");
         Serial.println("Qrcode");
-        if (page == 1) {
-          page = 3;
-          page1 = 0;
-        }
       }
     }
     if ((x > 175) && (x < 300)) {
@@ -86,6 +87,47 @@ void loop() {
     }
     delay(1000);
   }
+
+  while (arduinocon.available() > 0) {
+    char inByte = arduinocon.read();
+    Serial.print(inByte);
+
+    //เก็บสะสมค่าไว้ใน String ชื่อ msg
+    msg += inByte;
+
+    //จนกว่าค่าที่อ่านได้จะเป็นการขึ้นบรรทัดใหม่
+    if (inByte == '\n') {
+
+      //ดึงค่าแรก (index 0) ออกจาก String msg เก็บไว้บน value_1
+      String value_1 = getValue(msg, ',', 0);
+
+      //ดึงค่าแรก (index 1) ออกจาก String msg เก็บไว้บน value_2
+      String value_2 = getValue(msg, ',', 1);
+      if (value_1 == "c") {
+        page = value_2.toInt();
+        page1 = 0;
+        page2 = 0;
+        page3 = 0;
+      }
+      if (value_1 == "setcoin") {
+        coin = value_2.toInt();
+      }
+      if (value_1 == "setqr") {
+        qr = value_2;
+        if (page == 1) {
+          page = 3;
+          page1 = 0;
+          page2 = 0;
+          page3 = 0;
+        }
+      }
+      Serial.print( value_1 ); //แปลงค่าจาก String เป็นจำนวนเต็มด้วย toInt()
+      Serial.print(" and ");
+      Serial.println( value_2 ); //แปลงค่าจาก string เป็นทศนิยมด้วย toFloat()
+      msg = "";
+    }
+  }
+
 }
 void drawArrayJpeg(const uint8_t arrayname[], uint32_t array_size, int xpos, int ypos) {
 

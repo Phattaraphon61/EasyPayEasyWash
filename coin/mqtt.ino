@@ -15,15 +15,22 @@ void callback(char* topic, byte* payload, unsigned int length) {
   String value_2 = getValue(msgdata, ',', 1);
   Serial.println(value_1);
   if (value_1 == "qr") {
+    esp8266con.write("setqr,");
+    delay(1000);
+    writeString(value_2);
+    delay(3000);
     Serial.println(value_2);
+    esp8266con.write("\n");
   }
   if (value_1 == "op") {
     Serial.println("OPEN");
-    EEPROM.begin(12);
-    // write a 0 to all 512 bytes of the EEPROM
-    for (int i = 0; i < 512; i++) {
-      EEPROM.write(i, 0);
-    }
+    start_machine();
+    esp8266con.write("c,1\n");
+    //    EEPROM.begin(12);
+    //    // write a 0 to all 512 bytes of the EEPROM
+    //    for (int i = 0; i < 512; i++) {
+    //      EEPROM.write(i, 0);
+    //    }
     EEPROM.end();
   }
   if (value_1 == "check") {
@@ -61,5 +68,11 @@ void reconnect() {
       // Wait 5 seconds before retrying
       delay(5000);
     }
+  }
+}
+
+void writeString(String stringData) {
+  for (int i = 0; i < stringData.length(); i++) {
+    esp8266con.write(stringData[i]);
   }
 }

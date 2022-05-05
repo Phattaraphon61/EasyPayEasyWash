@@ -1,6 +1,7 @@
 void startsetup() {
   delay(1000);
   Serial.begin(9600);
+  esp8266con.begin(57600);
   EEPROM.begin(12);
   int readId;
   EEPROM.get(0, readId);

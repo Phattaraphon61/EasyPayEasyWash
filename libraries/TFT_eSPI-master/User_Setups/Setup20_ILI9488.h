@@ -12,7 +12,7 @@
 //#define TFT_RST  PIN_D4  // Reset pin (could connect to NodeMCU RST, see next line)
 #define TFT_RST  -1  // Set TFT_RST to -1 if the display RESET is connected to NodeMCU RST or 3.3V
 
-#define TOUCH_CS PIN_D2     // Chip select pin (T_CS) of touch screen
+#define TOUCH_CS 3    // Chip select pin (T_CS) of touch screen
 
 #define LOAD_GLCD   // Font 1. Original Adafruit 8 pixel font needs ~1820 bytes in FLASH
 #define LOAD_FONT2  // Font 2. Small 16 pixel high font, needs ~3534 bytes in FLASH, 96 characters

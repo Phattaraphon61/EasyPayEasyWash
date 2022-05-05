@@ -11,6 +11,7 @@ WiFiClient espClient;
 PubSubClient client(espClient);
 const char* mqtt_server = "mqtt.easypayeasywash.tk";
 void ICACHE_RAM_ATTR doCounter();
+SoftwareSerial esp8266con(5, 4);
 int Relay1 = D5;
 int Relay2 = D6;
 int sensor = D7;
@@ -34,8 +35,8 @@ void loop() {
   if (i == 20) {
     start_machine();
   }
-  while (Serial.available() > 0) {
-    char inByte = Serial.read();
+  while (esp8266con.available() > 0) {
+    char inByte = esp8266con.read();
 
 
     //เก็บสะสมค่าไว้ใน String ชื่อ msg
@@ -52,7 +53,7 @@ void loop() {
       if (value_1.toInt() == 1) {
         Serial.print("value_1 : ");
         Serial.println(value_2.toFloat());
-        snprintf (datas, 75, "EPEW%ld,%ld", ESP.getChipId(), value_2.toInt());
+        snprintf (datas, 75, "EPEW%ld,%ld", ESP.getChipId(), coin);
         client.publish("payment", datas);
       }
       if (value_1.toInt() == 2) {
