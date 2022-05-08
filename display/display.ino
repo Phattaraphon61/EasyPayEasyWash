@@ -1,42 +1,56 @@
 
+#include <ESP8266WiFi.h>
+#include <PubSubClient.h>
+#include <ESP8266WebServer.h>
+#include <AutoConnect.h>
+#include <ESP.h>
+#include <EEPROM.h>
 #include <TFT_eSPI.h>
 #include <qrcode_espi.h>
 #include <SoftwareSerial.h>
-TFT_eSPI tft = TFT_eSPI();
-QRcode_eSPI qrcode (&tft);
-SoftwareSerial arduinocon(5, 4);
-
 #include <JPEGDecoder.h>
-
 #define minimum(a,b)     (((a) < (b)) ? (a) : (b))
-
 #include "jpeg1.h"
 #include "jpeg2.h"
 #include "jpeg3.h"
 #include "jpeg4.h"
-
+ESP8266WebServer Server;
+AutoConnect      Portal(Server);
+WiFiClient espClient;
+PubSubClient client(espClient);
+const char* mqtt_server = "mqtt.easypayeasywash.tk";
+TFT_eSPI tft = TFT_eSPI();
+QRcode_eSPI qrcode (&tft);
+SoftwareSerial arduinocon(5, 4);
 uint32_t icount = 0;
-int coin = 20;
+char datas[50];
+int coin;
 String qr;
-int page = 1;
+int page = 0;
+int page0 = 0;
 int page1 = 0;
 int page2 = 0;
 int page3 = 0;
+int check;
 
 void setup() {
-  Serial.begin(115200);
-  arduinocon.begin(57600);
-  tft.begin();
-  qrcode.init();
-  tft.setRotation(1);
-  uint16_t calData[5] = { 304, 3621, 284, 3498, 7 };
-  tft.setTouch(calData);
-
+  startsetup();
 }
 
 void loop() {
+  client.loop();
+  Portal.handleClient();
+  if (!client.connected()) {
+    reconnect();
+  }
   static String msg = "";
   uint16_t x, y;
+  if (check != 1 && page0 == 0) {
+    tft.fillScreen(TFT_WHITE);
+    String id = "EPEW" + String(ESP.getChipId());
+    qrcode.create(id);
+    page0 = 1;
+  }
   if (page == 1 && page1 == 0) {
     drawArrayJpeg(Menu, sizeof(Menu), 0, 0);
     //     tft.fillRect(40, 120, 150, 130, TFT_RED);
@@ -71,7 +85,9 @@ void loop() {
     }
     if ((x > 290) && (x < 430)) {
       if ((y > 120) && (y < 255)) {
-        arduinocon.write("1,0\n");
+        arduinocon.write("coin,0\n");
+        snprintf (datas, 75, "EPEW%ld,%ld", ESP.getChipId(), coin);
+        client.publish("payment", datas);
         Serial.println("Qrcode");
       }
     }
@@ -100,26 +116,10 @@ void loop() {
 
       //ดึงค่าแรก (index 0) ออกจาก String msg เก็บไว้บน value_1
       String value_1 = getValue(msg, ',', 0);
-
       //ดึงค่าแรก (index 1) ออกจาก String msg เก็บไว้บน value_2
       String value_2 = getValue(msg, ',', 1);
-      if (value_1 == "c") {
-        page = value_2.toInt();
-        page1 = 0;
-        page2 = 0;
-        page3 = 0;
-      }
-      if (value_1 == "setcoin") {
+      if (value_1 == "coin") {
         coin = value_2.toInt();
-      }
-      if (value_1 == "setqr") {
-        qr = value_2;
-        if (page == 1) {
-          page = 3;
-          page1 = 0;
-          page2 = 0;
-          page3 = 0;
-        }
       }
       Serial.print( value_1 ); //แปลงค่าจาก String เป็นจำนวนเต็มด้วย toInt()
       Serial.print(" and ");
