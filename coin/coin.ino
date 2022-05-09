@@ -16,8 +16,13 @@ void setup() {
   startsetup();
 }
 void loop() {
+  delay(1000);
   ldrval = digitalRead(ldr);
-  if (i == 20) {
+  Serial.println(ldrval);
+  if (ldrval == 1) {
+    start_machine();
+  };
+  if (i == coin) {
     start_machine();
   }
   while (esp8266con.available() > 0) {
@@ -35,7 +40,7 @@ void loop() {
       //ดึงค่าแรก (index 1) ออกจาก String msg เก็บไว้บน value_2
       String value_2 = getValue(msg, ',', 1);
       if (value_1 == "coin") {
-        writeString("coin," + String(coin)+"\n");
+        writeString("coin," + String(coin) + "\n");
       }
       if (value_1 == "setcoin") {
         EEPROM.begin(12);
@@ -43,6 +48,9 @@ void loop() {
         EEPROM.commit();
         EEPROM.end();
         coin =  value_2.toInt();
+      }
+      if (value_1 == "op") {
+        start_machine();
       }
       Serial.print( value_1 ); //แปลงค่าจาก String เป็นจำนวนเต็มด้วย toInt()
       Serial.print(" and ");
@@ -54,6 +62,7 @@ void loop() {
 
 void doCounter() { // เมื่อเซ็นเซอร์ตรวจจับวัตถุ
   i += 10;
+  esp8266con.write("setcoin,0\n");
   Serial.println(i);
   delay(1000);
 }
