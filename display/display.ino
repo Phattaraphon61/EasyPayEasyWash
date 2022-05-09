@@ -86,9 +86,11 @@ void loop() {
     if ((x > 290) && (x < 430)) {
       if ((y > 120) && (y < 255)) {
         arduinocon.write("coin,0\n");
-        snprintf (datas, 75, "EPEW%ld,%ld", ESP.getChipId(), coin);
-        client.publish("payment", datas);
-        Serial.println("Qrcode");
+        if (coin != 0) {
+          snprintf (datas, 75, "EPEW%ld,%ld", ESP.getChipId(), coin);
+          client.publish("payment", datas);
+          Serial.println("Qrcode");
+        }
       }
     }
     if ((x > 175) && (x < 300)) {
@@ -120,6 +122,16 @@ void loop() {
       String value_2 = getValue(msg, ',', 1);
       if (value_1 == "coin") {
         coin = value_2.toInt();
+      }
+      if (value_1 == "setcoin") {
+        coin -= 10;
+      }
+      if (value_1 == "change") {
+        if (page != 1) {
+          page = 1;
+          page2 = 0;
+          page3 = 0;
+        }
       }
       Serial.print( value_1 ); //แปลงค่าจาก String เป็นจำนวนเต็มด้วย toInt()
       Serial.print(" and ");

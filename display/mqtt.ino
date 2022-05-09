@@ -24,12 +24,8 @@ void callback(char* topic, byte* payload, unsigned int length) {
     }
   }
   if (value_1 == "op") {
+    arduinocon.write("op,0\n");
     Serial.println("OPEN");
-    if (page != 1) {
-      page = 1;
-      page2 = 0;
-      page3 = 0;
-    }
   }
   if (value_1 == "setcoin") {
     String setcoin = "setcoin," + value_2 + "\n"; 
