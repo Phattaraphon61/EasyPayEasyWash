@@ -16,7 +16,6 @@ void callback(char* topic, byte* payload, unsigned int length) {
   Serial.println(value_1);
   if (value_1 == "qr") {
     esp8266con.write("setqr,");
-    delay(1000);
     writeString(value_2);
     delay(3000);
     Serial.println(value_2);
@@ -31,7 +30,7 @@ void callback(char* topic, byte* payload, unsigned int length) {
     //    for (int i = 0; i < 512; i++) {
     //      EEPROM.write(i, 0);
     //    }
-    EEPROM.end();
+//    EEPROM.end();
   }
   if (value_1 == "check") {
     Serial.println("check");
