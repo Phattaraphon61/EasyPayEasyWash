@@ -16,9 +16,7 @@ void setup() {
   startsetup();
 }
 void loop() {
-  delay(1000);
   ldrval = digitalRead(ldr);
-  Serial.println(ldrval);
   if (ldrval == 1) {
     start_machine();
   };
