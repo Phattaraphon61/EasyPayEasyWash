@@ -27,15 +27,19 @@ void callback(char* topic, byte* payload, unsigned int length) {
     arduinocon.write("op,0\n");
     Serial.println("OPEN");
   }
+  if (value_1 == "dis") {
+    WiFi.disconnect();
+    Serial.println("disconnect");
+  }
   if (value_1 == "setcoin") {
-    String setcoin = "setcoin," + value_2 + "\n"; 
+    String setcoin = "setcoin," + value_2 + "\n";
     writeString(setcoin);
     //    Serial.println("setcoin");
     //    EEPROM.begin(12);
     //    EEPROM.put(0, value_2.toInt());
     //    EEPROM.commit();
     //    EEPROM.end();
-//        coin =  value_2.toInt();
+    //        coin =  value_2.toInt();
   }
   if (value_1 == "login") {
     Serial.println("login");

@@ -12,5 +12,5 @@ void start_machine() {
   delay(1000);
   digitalWrite(Relay2, HIGH); // ส่งให้ไฟติด
   Serial.println("HIGH");
-  i = 0;
+  noti = 1;
 }

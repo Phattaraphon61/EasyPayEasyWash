@@ -31,6 +31,7 @@ int page0 = 0;
 int page1 = 0;
 int page2 = 0;
 int page3 = 0;
+int page4 = 0;
 int check;
 
 void setup() {
@@ -71,12 +72,18 @@ void loop() {
     qrcode.create(qr);
     page3 = 1;
   }
+  if (page == 4 && page4 == 0) {
+    drawArrayJpeg(Noti, sizeof(Noti), 0, 0);
+    String id = "EPEW" + String(ESP.getChipId());
+    qrcode.create(id);
+    page4 = 1;
+  }
   if (tft.getTouch(&x, &y))
   {
     if ((x > 40) && (x < 180)) {
       if ((y > 120) && (y < 255)) {
-        arduinocon.write("coin,0\n");
         Serial.println("Coin");
+        arduinocon.write("coin,0\n");
         if (page == 1) {
           page = 2;
           page1 = 0;
@@ -100,6 +107,7 @@ void loop() {
           page = 1;
           page2 = 0;
           page3 = 0;
+          page4 = 0;
         }
       }
     }
@@ -125,12 +133,26 @@ void loop() {
       }
       if (value_1 == "setcoin") {
         coin -= 10;
+        if (coin == 0) {
+          arduinocon.write("op,0\n");
+        }
       }
-      if (value_1 == "change") {
+      if (value_1 == "noti") {
+        snprintf (datas, 75, "EPEW%ld", ESP.getChipId());
+        client.publish("noti", datas);
         if (page != 1) {
           page = 1;
           page2 = 0;
           page3 = 0;
+          page4 = 0;
+        }
+      }
+      if (value_1 == "change") {
+        if (page != 1) {
+          page = 4;
+          page2 = 0;
+          page3 = 0;
+          page4 = 0;
         }
       }
       Serial.print( value_1 ); //แปลงค่าจาก String เป็นจำนวนเต็มด้วย toInt()

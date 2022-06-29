@@ -14,8 +14,9 @@ void startsetup() {
   if (check == 1) {
     page = 1;
   }
-  EEPROM.end();
   setup_wifi();
+  EEPROM.end();
   client.setServer(mqtt_server, 1883);
   client.setCallback(callback);
+  arduinocon.write("coin,0\n");
 }

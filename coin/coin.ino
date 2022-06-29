@@ -8,21 +8,21 @@ int Relay2 = D6;
 int sensor = D7;
 int ldr = D0;
 int ldrval = 0;
-int i = 0;
 char datas[50];
 int coin;
 static String msg = "";
+int noti = 0;
 void setup() {
   startsetup();
 }
 void loop() {
-  ldrval = digitalRead(ldr);
-  if (ldrval == 1) {
-    start_machine();
-  };
-  if (i == coin) {
-    start_machine();
+  if (noti == 1) {
+    ldrval = digitalRead(ldr);
   }
+  if (ldrval == 1 && noti == 1 ) {
+    esp8266con.write("noti,1\n");
+    noti = 0;
+  };
   while (esp8266con.available() > 0) {
     char inByte = esp8266con.read();
     Serial.print(inByte);
@@ -59,9 +59,7 @@ void loop() {
 }
 
 void doCounter() { // เมื่อเซ็นเซอร์ตรวจจับวัตถุ
-  i += 10;
   esp8266con.write("setcoin,0\n");
-  Serial.println(i);
   delay(1000);
 }
 
